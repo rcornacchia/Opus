@@ -1,7 +1,9 @@
 (ns account-api-v2.routes.services
   (:require [account-api-v2.routes.services.auth :as auth]
+            [account-api-v2.routes.services.upload :as upload]
             [ring.util.http-response :refer :all]
             [compojure.api.sweet :refer :all]
+            [compojure.api.upload :refer [wrap-multipart-params TempFileUpload]]
             [schema.core :as s]
             [compojure.api.meta :refer [restructure-param]]
             [buddy.auth.accessrules :refer [restrict]]
@@ -35,6 +37,20 @@
 (s/defschema Result
   {:result s/Keyword
    (s/optional-key :message) String})
+
+(defapi restricted-service-routes
+  {:swagger {:ui "/swagger-ui-private"
+             :spec "/swagger-private.json"
+             :data {:info {:version "1.0.0"
+                           :title "Profile Picture API"
+                           :description "Private Services"}}}}
+  (POST "/upload" req
+        :multipart-params [file :- TempFileUpload]
+        :middleware [wrap-multipart-params]
+        :summary "handles image upload"
+        :return Result
+        (println req)
+        (upload/save-image! (:identity req) file)))
 
 (defapi service-routes
   {:swagger {:ui "/swagger-ui"

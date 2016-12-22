@@ -24,11 +24,20 @@
         transform-op (AffineTransformOp. scale AffineTransformOp/TYPE_BILINEAR)]
     (.filter transform-op img (BufferedImage. width height (.getType img)))))
 
-(defn scale-image [file thumb-size])
+(defn scale-image [file thumb-size]
+  (let [img (ImageIO/read file)
+        img-width (.getWidth img)
+        img-height (.getHeight img)
+        ratio (/ thumb-size img-height)]
+    (scale img ratio (int (* img-width ratio)) thumb-size)))
 
-(defn image->byte-array [image])
+(defn image->byte-array [image]
+  (let [baos (ByteArrayOutputStream.)]
+    (ImageIO/write image "png" baos)
+    (.toByteArray baos)))
 
 (defn save-image! [user {:keys [tempfile filename content-type]}]
+  (println user)
   (try
     (let [db-file-name (str user (.replaceAll filename "[^a-zA-Z0-9-_\\.]" ""))]
       (db/save-profile-picture! {:email user
