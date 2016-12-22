@@ -1,0 +1,1 @@
+web: java $JVM_OPTS -cp target/uberjar/account-api-v2.jar clojure.main -m account-api-v2.core

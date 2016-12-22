@@ -1,0 +1,9 @@
+*\.DS_Store
+*\.lein-env
+*\.lein-repl-history
+*\.nrepl-port
+*image.jpg
+*scaled.jpg
+*log*
+*profiles.clj
+*target*
