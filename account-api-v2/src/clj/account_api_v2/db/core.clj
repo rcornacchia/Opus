@@ -16,7 +16,7 @@
 (defn create-user! [user]
   (let [oid (ObjectId.)
         m (merge user {:_id oid})]
-    (mc/insert db "users" m)))
+    (mc/insert-and-return db "users" m)))
 
 (defn update-user! [id first-name last-name email]
   (mc/update db "users" {:_id (ObjectId. id)}
@@ -24,9 +24,9 @@
                     :last_name last-name
                     :email email}}))
 
-(defn save-profile-picture! [{:keys [email picture-type picture-name picture-data] :as picture-map}]
-  (mc/update db "users" {:email email}
-             {$set {:profile_picture picture-map}}))
+(defn save-profile-picture! [{:keys [id picture-type picture-name picture-data] :as picture-map}]
+  (mc/update db "users" {:_id (ObjectId. id)}
+             {$set {:profile_picture (dissoc picture-map :id)}}))
 
 (defn get-user [email]
   (mc/find-one-as-map db "users" {:email email}))

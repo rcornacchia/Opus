@@ -36,15 +36,14 @@
     (ImageIO/write image "png" baos)
     (.toByteArray baos)))
 
-(defn save-image! [user {:keys [tempfile filename content-type]}]
-  (println user)
+(defn save-image! [id {:keys [tempfile filename content-type]}]
   (try
-    (let [db-file-name (str user (.replaceAll filename "[^a-zA-Z0-9-_\\.]" ""))]
-      (db/save-profile-picture! {:email user
+    (let [db-file-name (str id (.replaceAll filename "[^a-zA-Z0-9-_\\.]" ""))]
+      (db/save-profile-picture! {:id id
                                  :picture-type content-type
                                  :picture-name db-file-name
                                  :picture-data (file->bytearray tempfile)})
-      (db/save-profile-picture! {:email user
+      (db/save-profile-picture! {:id id
                                  :picture-type "image/png"
                                  :picture-data (image->byte-array
                                                 (scale-image tempfile thumb-size))

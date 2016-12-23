@@ -24,7 +24,7 @@
 (defn authenticate [[email pass]]
   (when-let [user (db/get-user email)]
     (when (hashers/check pass (:password user))
-      (:_id user))))
+      (str (:_id user)))))
 
 (defn login! [{:keys [session]} auth]
   (if-let [id (authenticate (decode-auth auth))]
@@ -41,12 +41,12 @@
 
 (defn register! [{:keys [session]} user]
   (try
-    (db/create-user!
-     (-> user
-         (dissoc :password-confirm)
-         (update :password hashers/encrypt)))
-    (-> {:result :ok}
-        (response/ok)
-        (assoc :session (assoc session :identity (:id user))))
+    (let [record  (db/create-user!
+                   (-> user
+                       (dissoc :password-confirm)
+                       (update :password hashers/encrypt)))]
+      (-> {:result :ok}
+          (response/ok)
+          (assoc :session (assoc session :identity (str (:_id record))))))
     (catch Exception e
       (handle-registration-error e))))
